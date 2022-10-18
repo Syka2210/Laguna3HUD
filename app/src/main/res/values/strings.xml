@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Laguna3HUD</string>
+    <string name="source_radio">RADIO</string>
+    <string name="source_cdplayer">CD PLAYER</string>
+    <string name="source_aux">AUX</string>
+    <string name="freq_type_radio_main">--</string>
+    <string name="chan_freq_radio_main">---.--</string>
+    <string name="chan_name_radio_main">--------</string>
+    <string name="chan_nr_radio_main">--</string>
+    <string name="volume">Volume:</string>
+    <string name="function_name">Function Name</string>
+    <string name="weather_cityName">---------</string>
+    <string name="weather_description">----- ------</string>
+    <string name="textDate">Aug 6, 2021</string>
+    <string name="weatherUpdateReq">request Weather Update</string>
+    <string name="testText">TextView</string>
+    <string name="icons_description">Image view set for changing icons</string>
+    <string name="debug_Box_header">-------Debug text input-------</string>
+    <string name="bass">BASS:</string>
+    <string name="treble">TREBLE:</string>
+    <string name="max_function_volume">+32</string>
+    <string name="app_selection_icons">app selection icons</string>
+    <string name="Button_req_text">REQ msg</string>
+</resources>
