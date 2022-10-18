@@ -583,6 +583,57 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         });
     }
 
+    public void highBox(final String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "highBox");
+                logFile("ANDROID: highBox");
+                //Set all card colours to main colour
+                radio2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                radio2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                radio2x4card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+
+                radio3x3grid2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                radio3x3grid2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                //Check for highlighted box nr
+                String[] messageIds = message.split(":");
+                if (messageIds[1].contains("2")){
+                    radio2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                    radio3x3grid2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                }else if (messageIds[1].contains("3")){
+                    radio2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                    radio3x3grid2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                }else if (messageIds[1].contains("4")){
+                    radio2x4card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                }
+            }
+        });
+    }
+
+    public void radioDisplay(final String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "radioDisplayShort");
+                logFile("ANDROID: radioDisplayShort");
+                closeAllDisplays();
+                clearTextBoxes();
+                //Set all card colours to main colour
+                radio2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                radio2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                radio2x4card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                /**
+                 * One row STRING EX    --> view_41 : FM : 3 (highlighted box) : 92.90 : KISS FM : 1 : end_string
+                 * Three rows STRING EX --> view_43 : FM : 3 (highlighted box) : 92.90 : 100.00 : 120.20 : KISS FM : PRO FM : DIGI FM : 1 : 2 : 3 : end_string
+                 */
+                String[] messageIds = message.split(":");
+                if (messageIds[0] == "")
+
+            }
+        });
+    }
+
 
 
 
