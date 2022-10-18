@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
@@ -628,13 +629,266 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
                  * Three rows STRING EX --> view_43 : FM : 3 (highlighted box) : 92.90 : 100.00 : 120.20 : KISS FM : PRO FM : DIGI FM : 1 : 2 : 3 : end_string
                  */
                 String[] messageIds = message.split(":");
-                if (messageIds[0] == "")
+                radio2x1text.setText(messageIds[1]);
+                if (messageIds[0].toLowerCase().contains("view_41")){
+                    radio2x2text.setText(messageIds[3]);
+                    radio2x3text.setText(messageIds[4]);
+                    radio2x4text.setText(messageIds[5]);
+                }else if (messageIds[0].toLowerCase().contains("view_43")){
+                    radio1x2text.setText(messageIds[3]);
+                    radio2x2text.setText(messageIds[4]);
+                    radio3x2text.setText(messageIds[5]);
+                    //---------------------------------
+                    radio1x3text.setText(messageIds[6]);
+                    radio2x3text.setText(messageIds[7]);
+                    radio3x3text.setText(messageIds[8]);
+                    //---------------------------------
+                    radio1x4text.setText(messageIds[9]);
+                    radio2x4text.setText(messageIds[10]);
+                    radio3x4text.setText(messageIds[11]);
+                }else {
+                    Log.i("DEBUG", "radioDisplay method received a package without a correct identifier");
+                    logFile("ANDROID: radioDisplay method received a package without a correct identifier");
+                    radio2x2text.setText("incorect");
+                    radio2x3text.setText("identifier");
+                }
 
+                if (messageIds[2].contains("2")) radio2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                else if (messageIds[2].contains("3")) radio2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                else if (messageIds[2].contains("4")) radio2x4card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                //Bring front the Radio layout.
+                radio3x4grid.setVisibility(View.VISIBLE);
             }
         });
     }
 
+    public void frequency3x3Display(final String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "frequency3x3Display");
+                logFile("ANDROID: Method -> frequency3x3Display");
+                closeAllDisplays();
+                clearTextBoxes();
+                //set all card colours to main colour
+                radio3x3grid2x1card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                radio3x3grid2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                radio3x3grid2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                /**
+                 * string ex: freq_grid3x3 : 3 (highlighted box) : PTY : 162 : - : end_string
+                 * string ex: freq_grid3x3 : 3 (highlighted box) : PTY : 162 : 162 : 162 : 1 : 2 : - : end_string
+                 */
+                String[] messageIds = message.split(":");
+                radio3x3grid2x1text.setText(messageIds[2]);
+                if (messageIds[0].toLowerCase().contains("????????")){
+                    radio3x3grid2x2text.setText(messageIds[3]);
+                    radio3x3grid2x3text.setText(messageIds[4]);
+                }else if (messageIds[0].toLowerCase().contains("????????")){
+                    radio3x3grid1x2text.setText(messageIds[3]);
+                    radio3x3grid2x2text.setText(messageIds[4]);
+                    radio3x3grid3x2text.setText(messageIds[5]);
+                    //----------------------------------------
+                    radio3x3grid1x3text.setText(messageIds[6]);
+                    radio3x3grid2x3text.setText(messageIds[7]);
+                    radio3x3grid3x3text.setText(messageIds[8]);
+                }else {
+                    Log.i("DEBUG", "freq_grid method received a package without a correct identifier");
+                    logFile("ANDROID: freq_grid method received a package without a correct identifier");
+                    radio3x3grid2x2text.setText("incorect");
+                    radio3x3grid2x3text.setText("identifier");
+                }
+                if (messageIds[1].contains("2")) radio3x3grid2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                if (messageIds[1].contains("3")) radio3x3grid2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                //Bring front the layout
+                radio3x3grid.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 
+/**—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*  A three row / three columns view, usually with icons in the first column, and text on the second
+*  There may be instances where in the second column we have additional icons (mainly in the settings - bluetooth).
+*      ||icon||TEXT||
+*      ||icon||TEXT||
+*      ||icon||TEXT||
+*—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*/
+    public void menuDisplay(final String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "menuDisplay");
+                logFile("ANDROID: menuDisplay");
+                closeAllDisplays();
+                clearTextBoxes();
+                setIconsToInvisible();
+                /**
+                 * STRING EX ---> view_c1 : icon1 : track_name1 : end_string
+                 * STRING EX ---> view_c3 : icon1 : icon2 : icon3 : track_name1 : track_name2 : track_name3 : end_string
+                 */
+                String[] messageIds = message.split(":");
+                if (messageIds[0].toLowerCase().contains("view_c1")){
+                    // Set first icon visible
+                    setIconsVisible("", messageIds[1], "");
+                    complex2x2text.setText(messageIds[2]);
+                }else if (messageIds[0].toLowerCase().contains("view_c3")){
+                    // Set first icon visible
+                    setIconsVisible(messageIds[1], messageIds[2], messageIds[3]);
+                    complex1x2text.setText(messageIds[4]);
+                    complex2x2text.setText(messageIds[5]);
+                    complex3x2text.setText(messageIds[6]);
+                }  else {
+                    Log.i("DEBUG", "menuDisplay method received a package without a correct identifier");
+                    logFile("ANDROID: menuDisplay method received a package without a correct identifier");
+                    complex1x2text.setText("incorect");
+                    complex2x2text.setText("identifier");
+                }
+                complex3x2grid.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+/**—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*  A progress bar that displays the level of volume for different setting of the audio.
+*        || Bluetooth volume      || +20 ||
+*        ||   ---------------            ||
+*—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*/
+    public void menuVolumeProgressBar(final String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "menuVolumeProgressBar");
+                logFile("ANDROID: Method -> menuVolumeProgressBar");
+                closeAllDisplays();
+                /**
+                 * string ex ---> view_70 : function_name : value : end_string
+                 */
+                String[] messageIds = message.split(":");
+                functionName.setText(messageIds[1]);
+                currentValue.setText(messageIds[2]);
+                menuVolumeProgressBar.setProgress(Integer.parseInt(messageIds[2]));
+                settigsMenuProgressBar.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+/**—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*  The musical atmosphere menu, which has a selection circle (empty or full), and on the Bass/treble option there
+*  are two level indicators for those settings.
+*        || ICON ||  "Rock"         ||  --   --
+*        || ICON ||  Bass/treble    ||  --   --
+*        || ICON ||  "Voice"        ||  --   --
+*                                        B   T
+*—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+ */
+    private void menuMusicalAtmosphere(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "menuMusicalAtmosphere");
+                logFile("ANDROID: menuMusicalAtmosphere");
+                int bassVolume;
+                int trebleVolume;
+                closeAllDisplays();
+                bassTrebleLayout.setVisibility(View.INVISIBLE);
+                bassTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                trebleTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                // String ex: view_73 : 2 (high box) : icon : icon : icon : title_1 : title_2 : title_3 : + : 5 : - : 2 : end_string
+                String[] messageIds = message.split(":");
+                if (messageIds[1].toLowerCase().contains("2")){
+                    //set other CardView to main colors
+                    bassTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                    trebleTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                    //set main CardView to select color
+                    cardRow2.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                    cardText2.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+
+                }
+                if (messageIds[1].toLowerCase().contains("3")){
+                    //set other CardView to main colors
+                    cardRow2.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                    cardText2.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                    trebleTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                    //set main CardView to select color
+                    bassTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                }
+                if (messageIds[1].toLowerCase().contains("4")){
+                    //set other CardView to main colors
+                    cardRow2.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                    cardText2.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                    bassTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+                    //set main CardView to select color
+                    trebleTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+                }
+
+                if (messageIds[2].length() == 0){
+                    emptyCercleRow1.setVisibility(View.INVISIBLE);
+                    checkedCercleRow1.setVisibility(View.INVISIBLE);
+                }
+                if (messageIds[2].toLowerCase().contains("icon_cercle_empty")){
+                    emptyCercleRow1.setVisibility(View.VISIBLE);
+                    checkedCercleRow1.setVisibility(View.INVISIBLE);
+                }
+                if (messageIds[2].toLowerCase().contains("icon_cercle_full")){
+                    emptyCercleRow1.setVisibility(View.INVISIBLE);
+                    checkedCercleRow1.setVisibility(View.VISIBLE);
+                }
+
+                if (messageIds[3].length() == 0){
+                    emptyCercleRow2.setVisibility(View.INVISIBLE);
+                    checkedCercleRow2.setVisibility(View.INVISIBLE);
+                }
+                if (messageIds[3].toLowerCase().contains("icon_cercle_empty")){
+                    emptyCercleRow2.setVisibility(View.VISIBLE);
+                    checkedCercleRow2.setVisibility(View.INVISIBLE);
+                }
+                if (messageIds[3].toLowerCase().contains("icon_cercle_full")){
+                    emptyCercleRow2.setVisibility(View.INVISIBLE);
+                    checkedCercleRow2.setVisibility(View.VISIBLE);
+                }
+
+                if (messageIds[4].length() == 0){
+                    emptyCercleRow3.setVisibility(View.INVISIBLE);
+                    checkedCercleRow3.setVisibility(View.INVISIBLE);
+                }
+                if (messageIds[4].toLowerCase().contains("icon_cercle_empty")){
+                    emptyCercleRow3.setVisibility(View.VISIBLE);
+                    checkedCercleRow3.setVisibility(View.INVISIBLE);
+                }
+                if (messageIds[4].toLowerCase().contains("icon_cercle_full")){
+                    emptyCercleRow3.setVisibility(View.INVISIBLE);
+                    checkedCercleRow3.setVisibility(View.VISIBLE);
+                }
+
+                musicalAtmosphereMainText1.setText(messageIds[5]);
+                musicalAtmosphereMainText2.setText(messageIds[6]);
+                musicalAtmosphereMainText3.setText(messageIds[7]);
+
+                if (messageIds[6].toLowerCase().contains("bass")){
+                    bassTrebleLayout.setVisibility(View.VISIBLE);
+                }
+
+                if (messageIds[8].contains("+")){
+                    bassVolume = Integer.parseInt(messageIds[9]) + 10;
+                    bassProgressBar.setProgress(bassVolume);
+                }else if (messageIds[8].contains("-")){
+                    bassVolume = 10 - Integer.parseInt(messageIds[9]);
+                    bassProgressBar.setProgress(bassVolume);
+                }
+
+                if (messageIds[10].contains("+")){
+                    trebleVolume = Integer.parseInt(messageIds[11]) + 10;
+                    trebleProgressBar.setProgress(trebleVolume);
+                }else if (messageIds[10].contains("-")){
+                    trebleVolume = 10 - Integer.parseInt(messageIds[11]);
+                    trebleProgressBar.setProgress(trebleVolume);
+                }
+
+                musicalAtmosphere.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 
 
     public void closeAllDisplays(){
@@ -653,6 +907,184 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
             }
         });
     }
+
+    public void clearTextBoxes(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "clearTextBoxes");
+                logFile("ANDROID: Method -> clearTextBoxes");
+                radio2x1text.setText("");
+                radio1x2text.setText("");
+                radio1x3text.setText("");
+                radio1x4text.setText("");
+                radio2x2text.setText("");
+                radio2x3text.setText("");
+                radio2x4text.setText("");
+                radio3x2text.setText("");
+                radio3x3text.setText("");
+                radio3x4text.setText("");
+
+                complex1x2text.setText("");
+                complex2x2text.setText("");
+                complex3x2text.setText("");
+
+                grid4text1x1.setText("");
+                grid4text2x1.setText("");
+                grid4text3x1.setText("");
+                grid4text1x2.setText("");
+
+                radio3x3grid1x1text.setText("");
+                radio3x3grid1x2text.setText("");
+                radio3x3grid1x3text.setText("");
+                radio3x3grid2x1text.setText("");
+                radio3x3grid2x2text.setText("");
+                radio3x3grid2x3text.setText("");
+                radio3x3grid3x1text.setText("");
+                radio3x3grid3x2text.setText("");
+                radio3x3grid3x3text.setText("");
+            }
+        });
+    }
+
+    public void setIconsToInvisible(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "setIconsToInvisible");
+                logFile("ANDROID: Method -> setIconsToInvisible");
+                complex1x1text.setVisibility(View.INVISIBLE);
+                complex2x1text.setVisibility(View.INVISIBLE);
+                complex3x1text.setVisibility(View.INVISIBLE);
+
+                //complex1x1image.setImageResource(android.R.color.transparent);
+                complex1x1image.setImageResource(0);
+                complex2x1image.setImageResource(0);
+                complex3x1image.setImageResource(0);
+
+                musicalAtmosphereRow1Image.setImageResource(0);
+                musicalAtmosphereRow2Image.setImageResource(0);
+                musicalAtmosphereRow3Image.setImageResource(0);
+
+            }
+        });
+    }
+
+    public void setIconsVisible(final String icon1, String icon2, String icon3){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "setIconsVisible");
+                logFile("ANDROID: Method -> setIconsVisible");
+                if (!icon1.contains("icon")){
+                    complex1x1text.setText(icon1);
+                    complex1x1text.setVisibility(View.VISIBLE);
+                }
+                if (icon1.toLowerCase().contains("icon")){
+                    Context context;
+                    int id = context.getResources().getIdentifier(icon1, "drawable", context.getPackageName());
+                    complex1x1image.setImageResource(id);
+                }
+
+                if (!icon2.contains("icon")) {
+                    complex2x1text.setText(icon2);
+                    complex2x1text.setVisibility(View.VISIBLE);
+                }
+                if (icon2.contains("icon_Audio_settings")) iconAudioSettings2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Phone_settings")) iconPhoneSettings2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_System_settings")) iconSystemSettings2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Bluetooth")) iconBluetooth2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Language")) iconLanguage2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Sound_optimization")) iconSoundOptimisation2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Musical_atmosphere")) iconMusicalAtmosphere2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Display_CD_time")) iconDisplayCDtime2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Radio_functions")) iconRadioFunctions2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Serious_classics")) iconSeriousClassics2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Varied_speech")) iconVariedSpeech2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_News")) iconNews2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Sport")) iconSport2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Pop_music")) iconPopMusic2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Pair_phone")) iconPairPhone2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Music_note")) iconMusicNote2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Vehicle_phonebook")) iconPhonebook2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Mobile_phonebook")) iconPhonebook2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Call_history")) iconCallHistory2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Mail_box")) iconMailbox2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Directory_management")) iconDirectoryManagement2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Other_audio_settings")) iconOtherAudioSettings2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Missed_calls")) iconMissedCalls2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Received_calls")) iconReceivedCalls2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Dialed_numbers")) iconDialedNumbers2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Put_on_hold")) iconPutOnHold2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_USB")) iconUSB2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Volume")) iconVolume2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Ringtone")) iconRingtone2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Cercle_empty")) iconCercle2x1empty.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Cercle_full")) iconCercle2x1full.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Checked_box")) iconCheckedBox2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Unchecked_box")) iconUncheckedBox2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Folder")) iconFolder2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Voice_prompt_volume")) iconVoicePromptVolume2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_1")) iconNumber_1_2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_2")) iconNumber_2_2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_3")) iconNumber_3_2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_4")) iconNumber_4_2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_5")) iconNumber_5_2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Adaptation_volume")) iconAdaptationVolume2x1.setVisibility(View.VISIBLE);
+                if (icon2.contains("icon_Emergency")) iconEmergency2x1.setVisibility(View.VISIBLE);
+                //-------------------------------------------------------------------------------------
+                if (!icon3.contains("icon")) {
+                    complex3x1text.setText(icon3);
+                    complex3x1text.setVisibility(View.VISIBLE);
+                }
+                if (icon3.contains("icon_Audio_settings")) iconAudioSettings3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Phone_settings")) iconPhoneSettings3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_System_settings")) iconSystemSettings3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Bluetooth")) iconBluetooth3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Language")) iconLanguage3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Sound_optimization")) iconSoundOptimisation3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Musical_atmosphere")) iconMusicalAtmosphere3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Display_CD_time")) iconDisplayCDtime3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Radio_functions")) iconRadioFunctions3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Serious_classics")) iconSeriousClassics3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Varied_speech")) iconVariedSpeech3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_News")) iconNews3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Sport")) iconSport3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Pop_music")) iconPopMusic3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Pair_phone")) iconPairPhone3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Music_note")) iconMusicNote3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Vehicle_phonebook")) iconPhonebook3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Mobile_phonebook")) iconPhonebook3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Call_history")) iconCallHistory3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Mail_box")) iconMailbox3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Directory_management")) iconDirectoryManagement3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Other_audio_settings")) iconOtherAudioSettings3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Missed_calls")) iconMissedCalls3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Received_calls")) iconReceivedCalls3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Dialed_numbers")) iconDialedNumbers3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Put_on_hold")) iconPutOnHold3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_USB")) iconUSB3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Volume")) iconVolume3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Ringtone")) iconRingtone3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Cercle_empty")) iconCercle3x1empty.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Cercle_full")) iconCercle3x1full.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Checked_box")) iconCheckedBox3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Unchecked_box")) iconUncheckedBox3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Folder")) iconFolder3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Voice_prompt_volume")) iconVoicePromptVolume3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_1")) iconNumber_1_3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_2")) iconNumber_2_3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_3")) iconNumber_3_3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_4")) iconNumber_4_3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_5")) iconNumber_5_3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Adaptation_volume")) iconAdaptationVolume3x1.setVisibility(View.VISIBLE);
+                if (icon3.contains("icon_Emergency")) iconEmergency3x1.setVisibility(View.VISIBLE);
+            }
+        });
+
+    }
+
+
 
 
 
