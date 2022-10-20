@@ -12,10 +12,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -627,25 +630,43 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
                 /**
                  * One row STRING EX    --> view_41 : FM : 3 (highlighted box) : 92.90 : KISS FM : 1 : end_string
                  * Three rows STRING EX --> view_43 : FM : 3 (highlighted box) : 92.90 : 100.00 : 120.20 : KISS FM : PRO FM : DIGI FM : 1 : 2 : 3 : end_string
+                 * ALSO!!!
+                 * One row STRING EX    --> view_41 : LW : 3 (highlighted box) : 102.00 : 1 : end_string
+                 * Three rows STRING EX --> view_43 : LW : 3 (highlighted box) : 102.00 : 102.00 : 102.00 : 1 : 2 : 3 : end_string
                  */
                 String[] messageIds = message.split(":");
                 radio2x1text.setText(messageIds[1]);
                 if (messageIds[0].toLowerCase().contains("view_41")){
-                    radio2x2text.setText(messageIds[3]);
-                    radio2x3text.setText(messageIds[4]);
-                    radio2x4text.setText(messageIds[5]);
+                    if (messageIds[5].toLowerCase().contains("end_string")){
+                        radio2x3text.setText(messageIds[3]);
+                        radio2x4text.setText(messageIds[4]);
+                    }else {
+                        radio2x2text.setText(messageIds[3]);
+                        radio2x3text.setText(messageIds[4]);
+                        radio2x4text.setText(messageIds[5]);
+                    }
                 }else if (messageIds[0].toLowerCase().contains("view_43")){
-                    radio1x2text.setText(messageIds[3]);
-                    radio2x2text.setText(messageIds[4]);
-                    radio3x2text.setText(messageIds[5]);
-                    //---------------------------------
-                    radio1x3text.setText(messageIds[6]);
-                    radio2x3text.setText(messageIds[7]);
-                    radio3x3text.setText(messageIds[8]);
-                    //---------------------------------
-                    radio1x4text.setText(messageIds[9]);
-                    radio2x4text.setText(messageIds[10]);
-                    radio3x4text.setText(messageIds[11]);
+                    if (messageIds[9].toLowerCase().contains("end_string")){
+                        radio1x3text.setText(messageIds[3]);
+                        radio2x3text.setText(messageIds[4]);
+                        radio3x3text.setText(messageIds[5]);
+                        //---------------------------------
+                        radio1x4text.setText(messageIds[6]);
+                        radio2x4text.setText(messageIds[7]);
+                        radio3x4text.setText(messageIds[8]);
+                    }else {
+                        radio1x2text.setText(messageIds[3]);
+                        radio2x2text.setText(messageIds[4]);
+                        radio3x2text.setText(messageIds[5]);
+                        //---------------------------------
+                        radio1x3text.setText(messageIds[6]);
+                        radio2x3text.setText(messageIds[7]);
+                        radio3x3text.setText(messageIds[8]);
+                        //---------------------------------
+                        radio1x4text.setText(messageIds[9]);
+                        radio2x4text.setText(messageIds[10]);
+                        radio3x4text.setText(messageIds[11]);
+                    }
                 }else {
                     Log.i("DEBUG", "radioDisplay method received a package without a correct identifier");
                     logFile("ANDROID: radioDisplay method received a package without a correct identifier");
@@ -662,6 +683,9 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         });
     }
 
+    /**
+     * TODO: DELETE - Obsolete - not necessary anymore!!!
+     */
     public void frequency3x3Display(final String message){
         runOnUiThread(new Runnable() {
             @Override
@@ -794,7 +818,9 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
                 bassTrebleLayout.setVisibility(View.INVISIBLE);
                 bassTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
                 trebleTextCard.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
-                // String ex: view_73 : 2 (high box) : icon : icon : icon : title_1 : title_2 : title_3 : + : 5 : - : 2 : end_string
+                /**
+                 * String ex: view_73 : 2 (high box) : icon : icon : icon : title_1 : title_2 : title_3 : + : 5 : - : 2 : end_string
+                 */
                 String[] messageIds = message.split(":");
                 if (messageIds[1].toLowerCase().contains("2")){
                     //set other CardView to main colors
@@ -823,42 +849,28 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
                 }
 
                 if (messageIds[2].length() == 0){
-                    emptyCercleRow1.setVisibility(View.INVISIBLE);
-                    checkedCercleRow1.setVisibility(View.INVISIBLE);
+                    musicalAtmosphereRow1Image.setImageResource(0);
+                }else if (messageIds[2].toLowerCase().contains("icon")){
+                    String drawable1 = messageIds[2].replace("icon_", "");
+                    drawable1 = drawable1.toLowerCase();
+                    int id = getResources().getIdentifier(drawable1, "drawable", getPackageName());
+                    musicalAtmosphereRow1Image.setImageResource(id);
                 }
-                if (messageIds[2].toLowerCase().contains("icon_cercle_empty")){
-                    emptyCercleRow1.setVisibility(View.VISIBLE);
-                    checkedCercleRow1.setVisibility(View.INVISIBLE);
-                }
-                if (messageIds[2].toLowerCase().contains("icon_cercle_full")){
-                    emptyCercleRow1.setVisibility(View.INVISIBLE);
-                    checkedCercleRow1.setVisibility(View.VISIBLE);
-                }
-
                 if (messageIds[3].length() == 0){
-                    emptyCercleRow2.setVisibility(View.INVISIBLE);
-                    checkedCercleRow2.setVisibility(View.INVISIBLE);
+                    musicalAtmosphereRow2Image.setImageResource(0);
+                }else if (messageIds[3].toLowerCase().contains("icon")){
+                    String drawable2 = messageIds[3].replace("icon_", "");
+                    drawable2 = drawable2.toLowerCase();
+                    int id = getResources().getIdentifier(drawable2, "drawable", getPackageName());
+                    musicalAtmosphereRow2Image.setImageResource(id);
                 }
-                if (messageIds[3].toLowerCase().contains("icon_cercle_empty")){
-                    emptyCercleRow2.setVisibility(View.VISIBLE);
-                    checkedCercleRow2.setVisibility(View.INVISIBLE);
-                }
-                if (messageIds[3].toLowerCase().contains("icon_cercle_full")){
-                    emptyCercleRow2.setVisibility(View.INVISIBLE);
-                    checkedCercleRow2.setVisibility(View.VISIBLE);
-                }
-
                 if (messageIds[4].length() == 0){
-                    emptyCercleRow3.setVisibility(View.INVISIBLE);
-                    checkedCercleRow3.setVisibility(View.INVISIBLE);
-                }
-                if (messageIds[4].toLowerCase().contains("icon_cercle_empty")){
-                    emptyCercleRow3.setVisibility(View.VISIBLE);
-                    checkedCercleRow3.setVisibility(View.INVISIBLE);
-                }
-                if (messageIds[4].toLowerCase().contains("icon_cercle_full")){
-                    emptyCercleRow3.setVisibility(View.INVISIBLE);
-                    checkedCercleRow3.setVisibility(View.VISIBLE);
+                    musicalAtmosphereRow3Image.setImageResource(0);
+                }else if (messageIds[4].toLowerCase().contains("icon")){
+                    String drawable3 = messageIds[4].replace("icon_", "");
+                    drawable3 = drawable3.toLowerCase();
+                    int id = getResources().getIdentifier(drawable3, "drawable", getPackageName());
+                    musicalAtmosphereRow3Image.setImageResource(id);
                 }
 
                 musicalAtmosphereMainText1.setText(messageIds[5]);
@@ -890,6 +902,58 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         });
     }
 
+/**—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*  A three rows on the first column with a only one box on the second column view.
+*        || TEXT ||                 ||
+*        ||------||                 ||
+*        || TEXT ||                 ||
+*        ||------||                 ||
+*        || TEXT ||                 ||
+*—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*/
+    public void confirm_cancel(String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "confirm_cancel");
+                logFile("ANDROID: confirm_cancel");
+                closeAllDisplays();
+                clearTextBoxes();
+                // string ex: view_63 : Cancel : Confirm : _ : Do you want to reset : these parameters? : end_string
+                String[] messageIds = message.split(":");
+                //Set text
+                grid4text1x1.setText(messageIds[1]);
+                grid4text2x1.setText(messageIds[2]);
+                grid4text3x1.setText(messageIds[3]);
+                grid4text1x2.append(messageIds[4] + "\r\n" + messageIds[5] + "\r\n" + messageIds[6]);
+                //----------------------------------
+                grid4.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+/**—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*  A INFO view. Only one box that receives characters. It might receive some icons, have to investigate.
+*        || TEXT          ||
+*        || TEXT          ||
+*        || TEXT          ||
+*—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*/
+    public void informationBox(String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "informationBox");
+                logFile("ANDROID: informationBox");
+                closeAllDisplays();
+                infoGridText.setText("");
+                // string ex: view_52 : Message is received here bla bla : end_string
+                String[] messageIds = message.split(":");
+                infoGridText.setText(messageIds[1]);
+                infoGrid.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 
     public void closeAllDisplays(){
         runOnUiThread(new Runnable() {
@@ -981,111 +1045,194 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
                     complex1x1text.setVisibility(View.VISIBLE);
                 }
                 if (icon1.toLowerCase().contains("icon")){
-                    Context context;
-                    int id = context.getResources().getIdentifier(icon1, "drawable", context.getPackageName());
+                    String drawable1 = icon1.replace("icon_", "");
+                    drawable1 = drawable1.toLowerCase();
+                    int id = getResources().getIdentifier(drawable1, "drawable", getPackageName());
                     complex1x1image.setImageResource(id);
                 }
-
+                //-------------------------------------------------------------------------------------
                 if (!icon2.contains("icon")) {
                     complex2x1text.setText(icon2);
                     complex2x1text.setVisibility(View.VISIBLE);
                 }
-                if (icon2.contains("icon_Audio_settings")) iconAudioSettings2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Phone_settings")) iconPhoneSettings2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_System_settings")) iconSystemSettings2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Bluetooth")) iconBluetooth2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Language")) iconLanguage2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Sound_optimization")) iconSoundOptimisation2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Musical_atmosphere")) iconMusicalAtmosphere2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Display_CD_time")) iconDisplayCDtime2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Radio_functions")) iconRadioFunctions2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Serious_classics")) iconSeriousClassics2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Varied_speech")) iconVariedSpeech2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_News")) iconNews2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Sport")) iconSport2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Pop_music")) iconPopMusic2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Pair_phone")) iconPairPhone2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Music_note")) iconMusicNote2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Vehicle_phonebook")) iconPhonebook2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Mobile_phonebook")) iconPhonebook2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Call_history")) iconCallHistory2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Mail_box")) iconMailbox2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Directory_management")) iconDirectoryManagement2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Other_audio_settings")) iconOtherAudioSettings2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Missed_calls")) iconMissedCalls2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Received_calls")) iconReceivedCalls2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Dialed_numbers")) iconDialedNumbers2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Put_on_hold")) iconPutOnHold2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_USB")) iconUSB2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Volume")) iconVolume2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Ringtone")) iconRingtone2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Cercle_empty")) iconCercle2x1empty.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Cercle_full")) iconCercle2x1full.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Checked_box")) iconCheckedBox2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Unchecked_box")) iconUncheckedBox2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Folder")) iconFolder2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Voice_prompt_volume")) iconVoicePromptVolume2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_1")) iconNumber_1_2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_2")) iconNumber_2_2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_3")) iconNumber_3_2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_4")) iconNumber_4_2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_5")) iconNumber_5_2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Adaptation_volume")) iconAdaptationVolume2x1.setVisibility(View.VISIBLE);
-                if (icon2.contains("icon_Emergency")) iconEmergency2x1.setVisibility(View.VISIBLE);
+                if (icon2.toLowerCase().contains("icon")){
+                    String drawable2 = icon2.replace("icon_", "");
+                    drawable2 = drawable2.toLowerCase();
+                    int id = getResources().getIdentifier(drawable2, "drawable", getPackageName());
+                    complex2x1image.setImageResource(id);
+                }
                 //-------------------------------------------------------------------------------------
                 if (!icon3.contains("icon")) {
                     complex3x1text.setText(icon3);
                     complex3x1text.setVisibility(View.VISIBLE);
                 }
-                if (icon3.contains("icon_Audio_settings")) iconAudioSettings3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Phone_settings")) iconPhoneSettings3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_System_settings")) iconSystemSettings3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Bluetooth")) iconBluetooth3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Language")) iconLanguage3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Sound_optimization")) iconSoundOptimisation3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Musical_atmosphere")) iconMusicalAtmosphere3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Display_CD_time")) iconDisplayCDtime3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Radio_functions")) iconRadioFunctions3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Serious_classics")) iconSeriousClassics3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Varied_speech")) iconVariedSpeech3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_News")) iconNews3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Sport")) iconSport3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Pop_music")) iconPopMusic3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Pair_phone")) iconPairPhone3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Music_note")) iconMusicNote3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Vehicle_phonebook")) iconPhonebook3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Mobile_phonebook")) iconPhonebook3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Call_history")) iconCallHistory3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Mail_box")) iconMailbox3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Directory_management")) iconDirectoryManagement3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Other_audio_settings")) iconOtherAudioSettings3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Missed_calls")) iconMissedCalls3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Received_calls")) iconReceivedCalls3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Dialed_numbers")) iconDialedNumbers3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Put_on_hold")) iconPutOnHold3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_USB")) iconUSB3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Volume")) iconVolume3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Ringtone")) iconRingtone3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Cercle_empty")) iconCercle3x1empty.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Cercle_full")) iconCercle3x1full.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Checked_box")) iconCheckedBox3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Unchecked_box")) iconUncheckedBox3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Folder")) iconFolder3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Voice_prompt_volume")) iconVoicePromptVolume3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_1")) iconNumber_1_3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_2")) iconNumber_2_3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_3")) iconNumber_3_3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_4")) iconNumber_4_3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_5")) iconNumber_5_3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Adaptation_volume")) iconAdaptationVolume3x1.setVisibility(View.VISIBLE);
-                if (icon3.contains("icon_Emergency")) iconEmergency3x1.setVisibility(View.VISIBLE);
+                if (icon3.toLowerCase().contains("icon")){
+                    String drawable3 = icon3.replace("icon_", "");
+                    drawable3 = drawable3.toLowerCase();
+                    int id = getResources().getIdentifier(drawable3, "drawable", getPackageName());
+                    complex3x1image.setImageResource(id);
+                }
             }
         });
 
     }
 
+    public void appSelectionMenu(String keyReceived){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "appSelectionMenu");
+                logFile("ANDROID: appSelectionMenu");
+//                appSelectPopUp.setContentView(R.layout.app_selection_menu);
+//                appSelectPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+                Intent googleMaps = getPackageManager().getLaunchIntentForPackage("com.google.android.apps.maps");
+                Intent waze = getPackageManager().getLaunchIntentForPackage("com.waze");
+                Intent spotify = getPackageManager().getLaunchIntentForPackage("com.spotify.music");
 
+                //set all the app background to not selected
+//                googleMapsCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+//                wazeCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+//                spotifyCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuBackground));
+//                app_select_tv.setText("0");
+                gMapsCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuBackground));
+                layout_wazeCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuBackground));
+                layout_spotifyCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuBackground));
+
+                if (keyReceived.toLowerCase().contains("menu")){
+                    if (appSelectionLayout.isShown()){
+                        appSelectionLayout.setVisibility(View.INVISIBLE);
+                    } else {
+                        appSelectionLayout.setVisibility(View.VISIBLE);
+                        selectedPopUpApp = 1;
+                        gMapsCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+                    }
+//                    if (appSelectPopUp.isShowing()){
+//                        appSelectPopUp.dismiss();
+//                        selectedPopUpApp = 1;
+//                    }
+//                    else {
+//                        selectedPopUpApp = 1;
+//                        appSelectPopUp.show();
+//                        googleMapsCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+//
+//                    }
+                }
+                else if (keyReceived.toLowerCase().contains("right")){
+                    if (selectedPopUpApp == 3) selectedPopUpApp = 1;
+                    else selectedPopUpApp++;
+                }
+                else if (keyReceived.toLowerCase().contains("left")){
+                    if (selectedPopUpApp == 1) selectedPopUpApp = 3;
+                    else selectedPopUpApp--;
+                }
+
+                //check which is the current app selected and highlight it
+                if (selectedPopUpApp == 1) {
+                    gMapsCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+//                    googleMapsCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+                    Log.i(TAG, "selectedPopUp=" + selectedPopUpApp +"; googleMapsCard");
+                }
+                else if (selectedPopUpApp == 2) {
+                    layout_wazeCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+//                    wazeCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+                    Log.i(TAG, "selectedPopUp=" + selectedPopUpApp +"; wazeCard");
+                }
+                else if (selectedPopUpApp == 3) {
+                    layout_spotifyCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+//                    spotifyCard.setCardBackgroundColor(getResources().getColor(R.color.popUpMenuSelected));
+                    Log.i(TAG, "selectedPopUp=" + selectedPopUpApp +"; spotifyCard");
+                }
+
+                if (keyReceived.toLowerCase().contains("enter") && appSelectionLayout.getVisibility() == View.VISIBLE){
+                    Log.i(TAG, "enter pressed");
+                    if (selectedPopUpApp == 1){
+                        Log.i(TAG, "selectedPopUp=1");
+                        //appSelectPopUp.dismiss();
+                        popUpMenuAppSelected = "googleMaps";
+                        appSelectionLayout.setVisibility(View.INVISIBLE);
+
+                        Intent speachIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                        speachIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                        speachIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please specify your destination:");
+                        startActivityForResult(speachIntent, RECOGNIZER_RESULT);
+                    }
+                    else if (selectedPopUpApp == 2){
+                        //appSelectPopUp.dismiss();
+                        popUpMenuAppSelected = "waze";
+                        appSelectionLayout.setVisibility(View.INVISIBLE);
+
+                        Intent speachIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                        speachIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                        speachIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please specify your destination:");
+                        startActivityForResult(speachIntent, RECOGNIZER_RESULT);
+                    }
+                    else if (selectedPopUpApp == 3){
+                        if (spotify != null){
+                            //appSelectPopUp.dismiss();
+                            appSelectionLayout.setVisibility(View.INVISIBLE);
+                            startActivity(spotify);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        Log.i(TAG, "onActivityResult");
+        logFile("ANDROID: onActivityResult -> get voice to text and open nav app with destination set");
+        if (requestCode == RECOGNIZER_RESULT && resultCode == RESULT_OK){
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            destination = matches.get(0).toString();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (popUpMenuAppSelected == "googleMaps"){
+            //Start GoogleMaps Intent using the data received from GoogleVoiceToText
+            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + destination + "&mode=d");
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+            popUpMenuAppSelected = "";
+            startActivity(mapIntent);
+        }else if (popUpMenuAppSelected == "waze"){
+            /**
+             * Start Waze Intent using the data received from GoogleVoiceToText
+             */
+            popUpMenuAppSelected = "";
+        }
+
+    }
+
+    /**
+     * TODO DELETE - OBSOLETE - just for testing
+     */
+    /*
+    public void openApp(View v){
+        Intent googleMaps = getPackageManager().getLaunchIntentForPackage("com.google.android.apps.maps");
+        Intent waze = getPackageManager().getLaunchIntentForPackage("com.waze");
+        Intent spotify = getPackageManager().getLaunchIntentForPackage("com.spotify.music");
+
+        if (v.getId() == R.id.googleMaps){
+            if (googleMaps != null){
+                startActivity(googleMaps);
+            }
+        }
+        if (v.getId() == R.id.waze){
+            if (waze != null){
+                startActivity(waze);
+            }
+        }
+        if (v.getId() == R.id.spotify){
+            if (spotify != null){
+                startActivity(spotify);
+            }
+        }
+        Log.i(TAG, "openApp");
+        logFile("ANDROID: openApp - Gmaps, Waze, Spotify");
+    }
+
+     */
 
 
     public void onReqButton(View v){
