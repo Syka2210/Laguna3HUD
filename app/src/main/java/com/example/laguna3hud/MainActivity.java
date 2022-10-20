@@ -70,12 +70,10 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     TextView weather_tempMax;
     double latitude = 0;
     double longitude = 0;
-
 /**
 * Debug box
 */
     private TextView debugTextbox;
-
 /**
 * App selection pop up
 */
@@ -179,9 +177,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-/**
-* Start a background service in order to keep the app run in the background
-*/
+     // ---> Start a background service in order to keep the app run in the background
         Intent backgroundServiceIntent = new Intent(this, BackgroundService.class);
         startService(backgroundServiceIntent);
 /**
@@ -192,17 +188,16 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         TextView textDate = findViewById(R.id.textDate);
         textDate.setText(currentDate);
-/**
- * Set the display always on. Set the Raspberry Pi Pico connection with the vendor id 11914
- * Optional you can use a Arduino with the vendor id 9025
- */
+    /*
+       Set the display always on. Set the Raspberry Pi Pico connection with the vendor id 11914
+       Optional you can use a Arduino with the vendor id 9025
+    */
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         arduino = new Arduino(this, 250000);
         arduino.addVendorId(11914); // Use 11914 for the Raspberry Pi Pico board or 9025 for the Arduino boards
         arduino.addVendorId(9025);
-/**
- *Request permission for location (in order to acquire the coordinates)
- */
+
+     // ---> Request permission for location (in order to acquire the coordinates)
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
                 ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
@@ -210,28 +205,22 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         } catch (Exception e){
             e.printStackTrace();
         }
-/**
- *Weather items
- */
+     // ---> Weather items
         weather_cityName = findViewById(R.id.weather_cityName);
         weather_mainTemp = findViewById(R.id.weather_mainTemp);
         weather_icon = findViewById(R.id.weather_icon);
         weather_description = findViewById(R.id.weather_description);
         weather_tempMax = findViewById(R.id.weather_tempMax);
         weather_tempMin = findViewById(R.id.weather_tempMin);
-/**
- * Start timed weather update
- */
+     // ---> Start timed weather update
         //updateWeather();
         timedRefreshWeather.run();
-/**
- * Debug box
- */
+
+     // ---> Debug box
+
         debugTextbox = findViewById(R.id.debugText);
         debugTextbox.setMovementMethod(new ScrollingMovementMethod());
-/**
-* App selection pop-up
-*/
+     // ---> App selection pop-up
 //        appSelectPopUp = new Dialog(this);
 //        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 //        @SuppressLint("InflateParams") View vi = inflater.inflate(R.layout.app_selection_menu, null);
@@ -243,21 +232,15 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         gMapsCard = findViewById(R.id.gMapsCard);
         layout_wazeCard = findViewById(R.id.wazeCard);
         layout_spotifyCard = findViewById(R.id.spotifyCard);
-/**
-* Declaring volume text view
-*/
+     // ---> Declaring volume text view
         volume = findViewById(R.id.volume_text);
-/**
-* Declaring the grid 4 layout
-*/
+     // ---> Declaring the grid 4 layout
         grid4 = findViewById(R.id.grid4);
         grid4text1x1 = findViewById(R.id.grid4text1x1);
         grid4text2x1 = findViewById(R.id.grid4text2x1);
         grid4text3x1 = findViewById(R.id.grid4text3x1);
         grid4text1x2 = findViewById(R.id.grid4text1x2);
-/**
- * Declaring radio 3x4 grid and it's cards and text views
- */
+     // ---> Declaring radio 3x4 grid and it's cards and text views
         radio3x4grid = findViewById(R.id.radio3x4grid);
         //--------------------------------------------
         radio1x2text = findViewById(R.id.radio1x2text);
@@ -276,9 +259,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         radio3x2text = findViewById(R.id.radio3x2text);
         radio3x3text = findViewById(R.id.radio3x3text);
         radio3x4text = findViewById(R.id.radio3x4text);
-/**
-* Declaring 3x3 radio grid
-*/
+     // ---> Declaring 3x3 radio grid
         radio3x3grid = findViewById(R.id.radio3x3grid);
         radio3x3grid2x1card = findViewById(R.id.radio3x3grid2x1card);
         radio3x3grid2x2card = findViewById(R.id.radio3x3grid2x2card);
@@ -293,10 +274,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         radio3x3grid3x1text = findViewById(R.id.radio3x3grid3x1text);
         radio3x3grid3x2text = findViewById(R.id.radio3x3grid3x2text);
         radio3x3grid3x3text = findViewById(R.id.radio3x3grid3x3text);
-/**
-* Declaring 3x2 grid with the first column for icons and second column for text
-*/
-        //
+     // ---> Declaring 3x2 grid with the first column for icons and second column for text
         complex3x2grid = findViewById(R.id.complex3x2grid);
         complex1x2text = findViewById(R.id.complex1x2text);
         complex2x2text = findViewById(R.id.complex2x2text);
@@ -308,16 +286,12 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         complex1x1image = findViewById(R.id.complex1x1image);
         complex2x1image = findViewById(R.id.complex2x1image);
         complex3x1image = findViewById(R.id.complex3x1image);
-/**
-* Declaring the menu Volume progress bar
-*/
+     // ---> Declaring the menu Volume progress bar
         settigsMenuProgressBar = findViewById(R.id.settingMenuProgressBarr);
         menuVolumeProgressBar = findViewById(R.id.menuVolumeProgressBar);
         functionName = findViewById(R.id.functionName);
         currentValue = findViewById(R.id.currentValue);
-/**
-* Declaring the muscial atmosphere grid with two progress bars
-*/
+     // ---> Declaring the muscial atmosphere grid with two progress bars
         musicalAtmosphere = findViewById(R.id.musicalAtmosphere);
         musicalAtmosphereRow1Image = findViewById(R.id.musicalAtmosphereRow1Image);
         musicalAtmosphereRow2Image = findViewById(R.id.musicalAtmosphereRow2Image);
@@ -333,9 +307,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         trebleTextCard = findViewById(R.id.trebleTextCard);
         bassProgressBar = findViewById(R.id.bassProgressBar);
         trebleProgressBar = findViewById(R.id.trebleProgressBar);
-/**
- * Declaring the Information one box
- */
+     // ---> Declaring the Information one box
         infoGrid = findViewById(R.id.infoGrid);
         infoGridText = findViewById(R.id.infoGridText);
 
@@ -419,7 +391,6 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
             /**
              * SOURCE
               */
-
             if (messageReceived.toLowerCase().contains("source")){
                 source(messageReceived);
                 messageReceived = "";
@@ -538,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     /**
      * Timed refresh of the weather widget
      */
-    private Runnable timedRefreshWeather = new Runnable() {
+    private final Runnable timedRefreshWeather = new Runnable() {
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void run() {
@@ -775,45 +746,42 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
      * TODO: DELETE - Obsolete - not necessary anymore!!!
      */
     public void frequency3x3Display(final String message){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "frequency3x3Display");
-                logFile("ANDROID: Method -> frequency3x3Display");
-                closeAllDisplays();
-                clearTextBoxes();
-                //set all card colours to main colour
-                radio3x3grid2x1card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
-                radio3x3grid2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
-                radio3x3grid2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
-                /**
-                 * string ex: freq_grid3x3 : 3 (highlighted box) : PTY : 162 : - : end_string
-                 * string ex: freq_grid3x3 : 3 (highlighted box) : PTY : 162 : 162 : 162 : 1 : 2 : - : end_string
-                 */
-                String[] messageIds = message.split(":");
-                radio3x3grid2x1text.setText(messageIds[2]);
-                if (messageIds[0].toLowerCase().contains("????????")){
-                    radio3x3grid2x2text.setText(messageIds[3]);
-                    radio3x3grid2x3text.setText(messageIds[4]);
-                }else if (messageIds[0].toLowerCase().contains("????????")){
-                    radio3x3grid1x2text.setText(messageIds[3]);
-                    radio3x3grid2x2text.setText(messageIds[4]);
-                    radio3x3grid3x2text.setText(messageIds[5]);
-                    //----------------------------------------
-                    radio3x3grid1x3text.setText(messageIds[6]);
-                    radio3x3grid2x3text.setText(messageIds[7]);
-                    radio3x3grid3x3text.setText(messageIds[8]);
-                }else {
-                    Log.i("DEBUG", "freq_grid method received a package without a correct identifier");
-                    logFile("ANDROID: freq_grid method received a package without a correct identifier");
-                    radio3x3grid2x2text.setText("incorect");
-                    radio3x3grid2x3text.setText("identifier");
-                }
-                if (messageIds[1].contains("2")) radio3x3grid2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
-                if (messageIds[1].contains("3")) radio3x3grid2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
-                //Bring front the layout
-                radio3x3grid.setVisibility(View.VISIBLE);
+        runOnUiThread(() -> {
+            Log.i(TAG, "frequency3x3Display");
+            logFile("ANDROID: Method -> frequency3x3Display");
+            closeAllDisplays();
+            clearTextBoxes();
+            //set all card colours to main colour
+            radio3x3grid2x1card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+            radio3x3grid2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+            radio3x3grid2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceMainBackground));
+            /**
+             * string ex: freq_grid3x3 : 3 (highlighted box) : PTY : 162 : - : end_string
+             * string ex: freq_grid3x3 : 3 (highlighted box) : PTY : 162 : 162 : 162 : 1 : 2 : - : end_string
+             */
+            String[] messageIds = message.split(":");
+            radio3x3grid2x1text.setText(messageIds[2]);
+            if (messageIds[0].toLowerCase().contains("????????")){
+                radio3x3grid2x2text.setText(messageIds[3]);
+                radio3x3grid2x3text.setText(messageIds[4]);
+            }else if (messageIds[0].toLowerCase().contains("????????")){
+                radio3x3grid1x2text.setText(messageIds[3]);
+                radio3x3grid2x2text.setText(messageIds[4]);
+                radio3x3grid3x2text.setText(messageIds[5]);
+                //----------------------------------------
+                radio3x3grid1x3text.setText(messageIds[6]);
+                radio3x3grid2x3text.setText(messageIds[7]);
+                radio3x3grid3x3text.setText(messageIds[8]);
+            }else {
+                Log.i("DEBUG", "freq_grid method received a package without a correct identifier");
+                logFile("ANDROID: freq_grid method received a package without a correct identifier");
+                radio3x3grid2x2text.setText("incorect");
+                radio3x3grid2x3text.setText("identifier");
             }
+            if (messageIds[1].contains("2")) radio3x3grid2x2card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+            if (messageIds[1].contains("3")) radio3x3grid2x3card.setCardBackgroundColor(getResources().getColor(R.color.sourceSelected));
+            //Bring front the layout
+            radio3x3grid.setVisibility(View.VISIBLE);
         });
     }
 
@@ -826,37 +794,34 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
 *—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 */
     public void menuDisplay(final String message){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "menuDisplay");
-                logFile("ANDROID: menuDisplay");
-                closeAllDisplays();
-                clearTextBoxes();
-                setIconsToInvisible();
-                /**
-                 * STRING EX ---> view_c1 : icon1 : track_name1 : end_string
-                 * STRING EX ---> view_c3 : icon1 : icon2 : icon3 : track_name1 : track_name2 : track_name3 : end_string
-                 */
-                String[] messageIds = message.split(":");
-                if (messageIds[0].toLowerCase().contains("view_c1")){
-                    // Set first icon visible
-                    setIconsVisible("", messageIds[1], "");
-                    complex2x2text.setText(messageIds[2]);
-                }else if (messageIds[0].toLowerCase().contains("view_c3")){
-                    // Set first icon visible
-                    setIconsVisible(messageIds[1], messageIds[2], messageIds[3]);
-                    complex1x2text.setText(messageIds[4]);
-                    complex2x2text.setText(messageIds[5]);
-                    complex3x2text.setText(messageIds[6]);
-                }  else {
-                    Log.i("DEBUG", "menuDisplay method received a package without a correct identifier");
-                    logFile("ANDROID: menuDisplay method received a package without a correct identifier");
-                    complex1x2text.setText("incorect");
-                    complex2x2text.setText("identifier");
-                }
-                complex3x2grid.setVisibility(View.VISIBLE);
+        runOnUiThread(() -> {
+            Log.i(TAG, "menuDisplay");
+            logFile("ANDROID: menuDisplay");
+            closeAllDisplays();
+            clearTextBoxes();
+            setIconsToInvisible();
+            /**
+             * STRING EX ---> view_c1 : icon1 : track_name1 : end_string
+             * STRING EX ---> view_c3 : icon1 : icon2 : icon3 : track_name1 : track_name2 : track_name3 : end_string
+             */
+            String[] messageIds = message.split(":");
+            if (messageIds[0].toLowerCase().contains("view_c1")){
+                // Set first icon visible
+                setIconsVisible("", messageIds[1], "");
+                complex2x2text.setText(messageIds[2]);
+            }else if (messageIds[0].toLowerCase().contains("view_c3")){
+                // Set first icon visible
+                setIconsVisible(messageIds[1], messageIds[2], messageIds[3]);
+                complex1x2text.setText(messageIds[4]);
+                complex2x2text.setText(messageIds[5]);
+                complex3x2text.setText(messageIds[6]);
+            }  else {
+                Log.i("DEBUG", "menuDisplay method received a package without a correct identifier");
+                logFile("ANDROID: menuDisplay method received a package without a correct identifier");
+                complex1x2text.setText("incorect");
+                complex2x2text.setText("identifier");
             }
+            complex3x2grid.setVisibility(View.VISIBLE);
         });
     }
 
