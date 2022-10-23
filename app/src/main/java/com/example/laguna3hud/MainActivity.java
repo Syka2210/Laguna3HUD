@@ -1,6 +1,8 @@
 package com.example.laguna3hud;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
@@ -9,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -42,10 +45,12 @@ import me.aflak.arduino.ArduinoListener;
 
 public class MainActivity extends AppCompatActivity implements ArduinoListener {
     private static final String TAG = "MainActivity";
+    /**
+     * Initialize Arduino
+      */
     private Arduino arduino;
     String messageReceived = "";
     public String volumeLast = "-";
-    public int selectedPopUpApp = 1;
 
 /**
 * Initialize log file
@@ -89,6 +94,15 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     CardView gMapsCard;
     CardView layout_wazeCard;
     CardView layout_spotifyCard;
+    public int selectedPopUpApp = 1;
+    /**
+     * Brightness level pop up
+     */
+    LinearLayout brightnessBarLayout;
+    ProgressBar brightnessBar;
+    int brightnessIncrement = 5;
+    int brightnessVal;
+    int curBrightnessValue = 1;
     /**
      * Declaring the Source Tab Layout
      */
@@ -180,6 +194,10 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
      // ---> Start a background service in order to keep the app run in the background
         Intent backgroundServiceIntent = new Intent(this, BackgroundService.class);
         startService(backgroundServiceIntent);
+     // ---> Ask permission for Write acces to controll brightness
+        askPermission(this);
+     // ---> Change to manual brightness
+        stopAutoBrightness(this);
 /**
  * Set the date bellow the digital clock
  * TODO: BEWARE!!! Check for regular update of the date, or at midnight it will not change. Maybe implement it with the weather refresh?
@@ -217,11 +235,10 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         timedRefreshWeather.run();
 
      // ---> Debug box
-
         debugTextbox = findViewById(R.id.debugText);
         debugTextbox.setMovementMethod(new ScrollingMovementMethod());
      // ---> App selection pop-up
-//        appSelectPopUp = new Dialog(this);
+        //appSelectPopUp = new Dialog(this);
 //        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 //        @SuppressLint("InflateParams") View vi = inflater.inflate(R.layout.app_selection_menu, null);
 //        googleMapsCard = vi.findViewById(R.id.googleMapsCard);
@@ -232,6 +249,10 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         gMapsCard = findViewById(R.id.gMapsCard);
         layout_wazeCard = findViewById(R.id.wazeCard);
         layout_spotifyCard = findViewById(R.id.spotifyCard);
+     // ---> Brightness level pop-up
+        brightnessBarLayout = findViewById(R.id.brightnessBarLayout);
+        brightnessBar = findViewById(R.id.brightnessBar);
+        brightnessBar.setMax(255);
      // ---> Declaring volume text view
         volume = findViewById(R.id.volume_text);
      // ---> Declaring the grid 4 layout
@@ -467,9 +488,17 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
              */
             else if(messageReceived.toLowerCase().contains("keypad")){
                 String[] messageIds = messageReceived.split(":");
-                // string ex: keypad : Menu : end_string
-                appSelectionMenu(messageIds[1]);
-                messageReceived = "";
+                if (messageReceived.toLowerCase().contains("menu")){
+                    // string ex: keypad : Menu : end_string
+                    appSelectionMenu(messageIds[1]);
+                    messageReceived = "";
+                }else if (messageReceived.toLowerCase().contains("brightness")){
+                    changeBrightness(messageIds[1]);
+                    messageReceived = "";
+                }else if (messageReceived.toLowerCase().contains("right") || messageReceived.toLowerCase().contains("left")){
+                    if (appSelectionLayout.isShown()) appSelectionMenu(messageIds[1]);
+                    else if (brightnessBarLayout.isShown()) changeBrightness(messageIds[1]);
+                }
             }
             /**
              * DATA FOR LOG
@@ -1300,6 +1329,50 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
                 }
             }
         }
+    }
+
+    public void askPermission(Context c){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (Settings.System.canWrite(c)){
+                //you have permission to write settings
+            }else {
+                Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                c.startActivity(i);
+            }
+        }
+    }
+
+    public static void stopAutoBrightness(Activity activity) {
+        android.provider.Settings.System.putInt(activity.getContentResolver(),
+                android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE,
+                android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+    }
+
+    public void changeBrightness(String message){
+        runOnUiThread(() -> {
+            Log.i(TAG, "changeBrightness method");
+            if (message.toLowerCase().contains("brightness")){
+                if (brightnessBarLayout.isShown()) brightnessBarLayout.setVisibility(View.GONE);
+                else {
+                    try {
+                        curBrightnessValue = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+                    } catch (Settings.SettingNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    brightnessVal = curBrightnessValue;
+                    brightnessBar.setProgress(curBrightnessValue);
+                    brightnessBarLayout.setVisibility(View.VISIBLE);
+                }
+            } else if (message.toLowerCase().contains("right") && brightnessBarLayout.isShown()){
+                brightnessVal = brightnessVal + brightnessIncrement;
+                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightnessVal);
+                brightnessBar.setProgress(brightnessVal);
+            } else if (message.toLowerCase().contains("left") && brightnessBarLayout.isShown()){
+                brightnessVal = brightnessVal - brightnessIncrement;
+                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightnessVal);
+                brightnessBar.setProgress(brightnessVal);
+            }
+        });
     }
 
 }

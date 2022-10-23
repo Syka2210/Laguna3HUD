@@ -239,9 +239,9 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="20dp"
             android:gravity="bottom"
-            android:orientation="horizontal"/>
+            android:orientation="horizontal" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -1385,6 +1385,37 @@
 
         </LinearLayout>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/brightnessBarLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/volumeLayout"
+        app:layout_constraintEnd_toStartOf="@+id/weatherLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sourceTabLayout">
+
+        <TextView
+            android:id="@+id/brightnessTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="15dp"
+            android:paddingEnd="5dp"
+            android:text="@string/brightness"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:background="@color/sourceMainBackground"/>
+
+        <ProgressBar
+            android:id="@+id/brightnessBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="400dp"
+            android:layout_height="40dp" />
     </LinearLayout>
 
     <Button

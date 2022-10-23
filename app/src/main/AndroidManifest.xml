@@ -31,5 +31,7 @@
         </activity>
         <service android:name=".BackgroundService"/>
     </application>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
 </manifest>
