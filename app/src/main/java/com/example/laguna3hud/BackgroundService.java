@@ -11,16 +11,13 @@ public class BackgroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        while (true) {
-                            Log.i("Service", "The service is still runing in the background...");
-                            try {
-                                Thread.sleep(60000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                () -> {
+                    while (true) {
+                        Log.i("Service", "The service is still runing in the background...");
+                        try {
+                            Thread.sleep(60000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 }

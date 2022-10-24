@@ -2,6 +2,7 @@ package com.example.laguna3hud;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -45,6 +46,10 @@ import me.aflak.arduino.ArduinoListener;
 
 public class MainActivity extends AppCompatActivity implements ArduinoListener {
     private static final String TAG = "MainActivity";
+    /**
+     * Create activity status (background or activity running)
+     */
+    private boolean activityOnStop = false;
     /**
      * Initialize Arduino
       */
@@ -343,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     protected void onStart() {
         super.onStart();
         arduino.setArduinoListener(this);
+        activityOnStop = false;
         Log.i("MainActivity", "onStart");
         logFile("ANDROID: onStart");
      // ---> Send a message request in case the app has been restarted
@@ -354,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     @Override
     protected void onResume() {
         super.onResume();
+        activityOnStop = false;
         Log.i("MainActivity", "onResume");
         logFile("ANDROID: onResume");
         String msg = "reqMsg";
@@ -371,6 +378,9 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     @Override
     protected void onStop() {
         super.onStop();
+        activityOnStop = true;
+        if (brightnessBarLayout.isShown()) brightnessBarLayout.setVisibility(View.INVISIBLE);
+        if (appSelectionLayout.isShown()) appSelectionLayout.setVisibility(View.INVISIBLE);
         Log.i("MainActivity", "onStop");
         logFile("ANDROID: onStop");
     }
@@ -490,6 +500,15 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
              */
             else if(messageReceived.toLowerCase().contains("keypad")){
                 String[] messageIds = messageReceived.split(":");
+                /**
+                 * we search to see if we receive menu or brightness - and if the app is in background
+                 * and if the app selection menu or brightness
+                 */
+                if (activityOnStop == true){
+                    if (messageIds[1].toLowerCase().contains("menu") || messageIds[1].toLowerCase().contains("brightness")){
+                        bringBackApp();
+                    }
+                }
                 if (messageReceived.toLowerCase().contains("menu")){
                     if (brightnessBarLayout.isShown()) brightnessBarLayout.setVisibility(View.INVISIBLE);
                     // string ex: keypad : Menu : end_string
@@ -1378,6 +1397,16 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
                 brightnessBar.setProgress(brightnessVal);
             }
         });
+    }
+
+    public void bringBackApp(){
+        Log.i(TAG, "bringBackApp");
+        Intent intent = new Intent("intent.my.action");
+        intent.setComponent(new ComponentName(this, MainActivity.class));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        startActivity(intent);
     }
 
 }
