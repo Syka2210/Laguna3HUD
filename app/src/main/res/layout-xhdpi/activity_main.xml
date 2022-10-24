@@ -1392,7 +1392,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/volumeLayout"
         app:layout_constraintEnd_toStartOf="@+id/weatherLayout"
         app:layout_constraintStart_toStartOf="parent"

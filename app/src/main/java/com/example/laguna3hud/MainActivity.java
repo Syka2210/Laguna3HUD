@@ -254,6 +254,10 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         brightnessBar.setMax(255);
      // ---> Declaring volume text view
         volume = findViewById(R.id.volume_text);
+     // ---> Declaring the source cards
+        radioCard = findViewById(R.id.sourceRadioCard);
+        cdplayerCard = findViewById(R.id.sourceCdplayerCard);
+        auxCard = findViewById(R.id.sourceAuxCard);
      // ---> Declaring the grid 4 layout
         grid4 = findViewById(R.id.grid4);
         grid4text1x1 = findViewById(R.id.grid4text1x1);
@@ -341,11 +345,10 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         arduino.setArduinoListener(this);
         Log.i("MainActivity", "onStart");
         logFile("ANDROID: onStart");
-        /*
+     // ---> Send a message request in case the app has been restarted
         String msg = "reqMsg";
         arduino.send(msg.getBytes());
         Log.i(TAG, msg);
-         */
     }
 
     @Override
