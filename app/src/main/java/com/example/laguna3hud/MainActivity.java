@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     private Arduino arduino;
     String messageReceived = "";
     public String volumeLast = "-";
-
 /**
 * Initialize log file
 */
@@ -339,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     @Override
     protected void onStart() {
         super.onStart();
-        arduino.setArduinoListener((ArduinoListener) this);
+        arduino.setArduinoListener(this);
         Log.i("MainActivity", "onStart");
         logFile("ANDROID: onStart");
         /*
@@ -489,16 +488,18 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
             else if(messageReceived.toLowerCase().contains("keypad")){
                 String[] messageIds = messageReceived.split(":");
                 if (messageReceived.toLowerCase().contains("menu")){
+                    if (brightnessBarLayout.isShown()) brightnessBarLayout.setVisibility(View.INVISIBLE);
                     // string ex: keypad : Menu : end_string
                     appSelectionMenu(messageIds[1]);
-                    messageReceived = "";
                 }else if (messageReceived.toLowerCase().contains("brightness")){
+                    if (appSelectionLayout.isShown()) appSelectionLayout.setVisibility(View.INVISIBLE);
+                    // string ex: keypad : brightness : end_string
                     changeBrightness(messageIds[1]);
-                    messageReceived = "";
                 }else if (messageReceived.toLowerCase().contains("right") || messageReceived.toLowerCase().contains("left")){
                     if (appSelectionLayout.isShown()) appSelectionMenu(messageIds[1]);
                     else if (brightnessBarLayout.isShown()) changeBrightness(messageIds[1]);
                 }
+                messageReceived = "";
             }
             /**
              * DATA FOR LOG
@@ -814,9 +815,10 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         });
     }
 
-/**—————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-*  A three row / three columns view, usually with icons in the first column, and text on the second
-*  There may be instances where in the second column we have additional icons (mainly in the settings - bluetooth).
+/**
+*<li> —————————————————————————————————————————————————————————————————————————————————————————————————————————————————</li>
+*<li>  A three row / three columns view, usually with icons in the first column, and text on the second</li>
+*<li>  There may be instances where in the second column we have additional icons (mainly in the settings - bluetooth).</li>
 *      ||icon||TEXT||
 *      ||icon||TEXT||
 *      ||icon||TEXT||

@@ -245,7 +245,7 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="170dp"
+            android:layout_height="200dp"
             app:cardBackgroundColor="#111C59">
 
             <TextView
@@ -1392,30 +1392,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/volumeLayout"
         app:layout_constraintEnd_toStartOf="@+id/weatherLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sourceTabLayout">
+        app:layout_constraintTop_toBottomOf="@+id/sourceTabLayout"
+        android:background="@color/sourceMainBackground">
 
         <TextView
             android:id="@+id/brightnessTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/sourceMainBackground"
             android:fontFamily="sans-serif-black"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
             android:paddingStart="15dp"
+            android:paddingTop="4dp"
             android:paddingEnd="5dp"
+            android:paddingBottom="4dp"
             android:text="@string/brightness"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:background="@color/sourceMainBackground"/>
+            android:textSize="20sp" />
 
         <ProgressBar
             android:id="@+id/brightnessBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="400dp"
-            android:layout_height="40dp" />
+            android:layout_height="20dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"/>
     </LinearLayout>
 
     <Button
