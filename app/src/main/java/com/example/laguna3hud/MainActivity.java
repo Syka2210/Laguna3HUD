@@ -1369,11 +1369,11 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
                     brightnessBarLayout.setVisibility(View.VISIBLE);
                 }
             } else if (message.toLowerCase().contains("right") && brightnessBarLayout.isShown()){
-                brightnessVal = brightnessVal + brightnessIncrement;
+                if (brightnessVal <= 250) brightnessVal = brightnessVal + brightnessIncrement;
                 Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightnessVal);
                 brightnessBar.setProgress(brightnessVal);
             } else if (message.toLowerCase().contains("left") && brightnessBarLayout.isShown()){
-                brightnessVal = brightnessVal - brightnessIncrement;
+                if (brightnessVal > 6) brightnessVal = brightnessVal - brightnessIncrement;
                 Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightnessVal);
                 brightnessBar.setProgress(brightnessVal);
             }
